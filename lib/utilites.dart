@@ -20,9 +20,26 @@ class AppAssets{
   static const String joe ='assets/characters/joe.jpg';
   static const String tantoon ='assets/characters/tantoon.jpg';
   static const String mino ='assets/characters/mino.png';
+  static const String tito ='assets/characters/tito.png';
   static const String spy ='assets/security.png';
   static const String huddle ='assets/huddle.png';
   static const String happy ='assets/happy.png';
   static const String splashScreen ='assets/splashScreen.png';
+  static const String bg ='assets/bg.png';
+  static const String aa ='assets/button/a.png';
+  static const String bb ='assets/button/b.png';
+  static const String cc ='assets/button/c.png';
+  static const String dd ='assets/button/d.png';
+  static const String ee ='assets/button/e.png';
+  static const String ff ='assets/button/f.png';
+  static const String Group ='assets/Group.png';
+  static const String man ='assets/man.png';
+  static const String man2 ='assets/man2.png';
+  static const String place ='assets/imageCategory/place.png';
+  static const String worker ='assets/imageCategory/worker.png';
+  static const String manstahnash ='assets/imageCategory/manstahnash.png';
+  static const String food ='assets/imageCategory/food.png';
+  static const String film ='assets/imageCategory/film.png';
+  static const String celebrities ='assets/imageCategory/celebrities.png';
 
 }

@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:imposter/Categories_page.dart';
 import 'package:imposter/categoryCharacters.dart';
 import 'package:imposter/categoryItems.dart';
-import 'package:imposter/findImposter.dart';
 import 'package:imposter/utilites.dart';
-
-import 'imposterResultScreen.dart';
-
+import 'gameManager.dart';
+import 'guessImposterScreen.dart';
 
 class CharacterRevealScreen extends StatefulWidget {
   final List<int> selectedIndices;
@@ -26,82 +24,107 @@ class CharacterRevealScreen extends StatefulWidget {
 }
 
 class _CharacterRevealScreenState extends State<CharacterRevealScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
+  final GameManager _gameManager = GameManager();
   int currentIndex = 0;
   double dragOffset = 0;
   bool isRevealed = false;
-  late List<int> imposterIndices; // ✅ تغيير: قائمة بدل رقم واحد
+  late List<int> imposterIndices;
   late List<int> shuffledIndices;
   late AnimationController _bounceController;
+  late AnimationController _swipeAnimController;
+  late Animation<double> _swipeFadeAnimation;
+  late Animation<Offset> _swipeSlideAnimation;
 
   @override
   void initState() {
     super.initState();
-    shuffledIndices = List.from(widget.selectedIndices)..shuffle();
 
-    // ✅ اختيار عدد من الـ imposters عشوائياً
-    imposterIndices = _selectRandomImposters();
+    shuffledIndices = List.from(widget.selectedIndices)..shuffle();
+    _selectAndSaveImposters();
 
     _bounceController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
+
+    _swipeAnimController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+
+    _swipeFadeAnimation = Tween<double>(begin: 0.2, end: 1.0).animate(
+      CurvedAnimation(parent: _swipeAnimController, curve: Curves.easeInOut),
+    );
+
+    _swipeSlideAnimation = Tween<Offset>(
+      begin: Offset(0, 0.4),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(parent: _swipeAnimController, curve: Curves.easeInOut),
+    );
   }
 
-  // ✅ دالة جديدة لاختيار الـ imposters
-  List<int> _selectRandomImposters() {
-    List<int> allIndices = List.generate(shuffledIndices.length, (i) => i);
-    allIndices.shuffle();
-    return allIndices.take(widget.imposterCount).toList();
+  void _selectAndSaveImposters() {
+    List<int> randomPositions = List.generate(shuffledIndices.length, (i) => i);
+    randomPositions.shuffle();
+    imposterIndices = randomPositions.take(widget.imposterCount).toList();
+
+    _gameManager.currentImposters = imposterIndices.map((position) {
+      int characterIndex = shuffledIndices[position];
+      return widget.selectedIndices.indexOf(characterIndex);
+    }).toList();
+
+    print('🎮 Selected Imposters:');
+    for (int i = 0; i < imposterIndices.length; i++) {
+      int displayPosition = imposterIndices[i];
+      int characterIndex = shuffledIndices[displayPosition];
+      int originalPosition = widget.selectedIndices.indexOf(characterIndex);
+      print('   Position $displayPosition: ${namesCharacters[characterIndex + 1]} (Original: $originalPosition)');
+    }
   }
 
   @override
   void dispose() {
     _bounceController.dispose();
+    _swipeAnimController.dispose();
     super.dispose();
   }
 
+  bool _isNavigating = false;
+
   void nextCharacter() {
+    if (_isNavigating) return;
+
+    setState(() {
+      _isNavigating = true;  // ← setState عشان الزرار يتعطل فوراً في الـ UI
+    });
+
     if (currentIndex < shuffledIndices.length - 1) {
-      setState(() {
-        currentIndex++;
-        dragOffset = 0;
-        isRevealed = false;
+      Future.delayed(Duration(milliseconds: 100), () {
+        setState(() {
+          currentIndex++;
+          dragOffset = 0;
+          isRevealed = false;
+          _isNavigating = false;
+        });
       });
     } else {
-      // ✅ جمع بيانات كل الـ imposters
-      List<Map<String, dynamic>> impostersData = imposterIndices.map((index) {
-        int characterIndex = shuffledIndices[index];
-        return {
-          'name': namesCharacters[characterIndex + 1],
-          'image': arrCharacters[characterIndex + 1],
-        };
-      }).toList();
-
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => FindImposter(
-            selectedIndices: shuffledIndices,
-            impostersData: impostersData, // ✅ إرسال كل الـ imposters
-            onContinue: () {
-              Navigator.pushNamed(context, Categories_page.routeName);
-            },
-          ),
-        ),
-      );
+        MaterialPageRoute(builder: (context) => GuessImposterScreen()),
+      ).then((_) => setState(() => _isNavigating = false));
     }
-  }
-
-  @override
+  }  @override
   Widget build(BuildContext context) {
     int characterIndex = shuffledIndices[currentIndex];
-    bool isImposter = imposterIndices.contains(currentIndex); // ✅ تحقق من القائمة
+    bool isImposter = imposterIndices.contains(currentIndex);
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Stack(
         children: [
+          // ── الخلفية مع الدور ──
           Container(
             color: Colors.black,
             child: Center(
@@ -133,6 +156,8 @@ class _CharacterRevealScreenState extends State<CharacterRevealScreen>
               ),
             ),
           ),
+
+          // ── الشاشة القابلة للسحب ──
           AnimatedBuilder(
             animation: _bounceController,
             builder: (context, child) {
@@ -146,15 +171,9 @@ class _CharacterRevealScreenState extends State<CharacterRevealScreen>
                   onVerticalDragUpdate: (details) {
                     setState(() {
                       dragOffset += details.delta.dy;
-                      if (dragOffset > 0) {
-                        dragOffset = 0;
-                      }
-                      if (dragOffset < maxRevealOffset) {
-                        dragOffset = maxRevealOffset;
-                      }
-                      if (dragOffset <= maxRevealOffset) {
-                        isRevealed = true;
-                      }
+                      if (dragOffset > 0) dragOffset = 0;
+                      if (dragOffset < maxRevealOffset) dragOffset = maxRevealOffset;
+                      if (dragOffset <= maxRevealOffset) isRevealed = true;
                     });
                   },
                   onVerticalDragEnd: (details) {
@@ -167,114 +186,113 @@ class _CharacterRevealScreenState extends State<CharacterRevealScreen>
                       _bounceController.forward(from: 0).then((_) {
                         setState(() {
                           dragOffset = 0;
-                          isRevealed = false;
+                          // ✅ مش بنغير isRevealed هنا خالص
+                          // لو اترفعت قبل كده تفضل ظاهرة
                         });
                         _bounceController.reset();
                       });
                     }
-                  },
-                  child: Container(
+                  },                  child: SizedBox(
                     height: screenHeight,
                     child: Stack(
                       children: [
-                        Positioned(
-                          top: MediaQuery.of(context).size.height / 2,
-                          left: 220,
-                          right: 0,
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: nextCharacter,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0x8307ef4e),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 30, vertical: 7),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: Text(
-                                currentIndex < shuffledIndices.length - 1
-                                    ? 'Next'
-                                    : 'End',
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // ── صورة الشخصية ──
                         Positioned.fill(
                           child: Image(
                             image: arrCharacters[characterIndex + 1],
                             fit: BoxFit.cover,
                           ),
                         ),
+
+                        // ── gradient سفلي + اسم الشخصية ──
                         Positioned(
-                          top: MediaQuery.of(context).size.height / 2,
-                          left: 220,
+                          bottom: 50,
+                          left: 0,
                           right: 0,
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: nextCharacter,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0x8307ef4e),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 30, vertical: 7),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(16, 40, 16, 100),
+
+                            child: Text(
+                              namesCharacters[characterIndex + 1],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
                               ),
-                              child: Text(
-                                currentIndex < shuffledIndices.length - 1
-                                    ? 'Next'
-                                    : 'End',
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            ),
+                          ),
+                        ),
+
+                        // ── Swipe Up indicator متحرك ──
+                        Positioned(
+                          bottom: 30,
+                          left: 0,
+                          right: 0,
+                          child: AnimatedOpacity(
+                            opacity: isRevealed ? 0.0 : 1.0,
+                            duration: Duration(milliseconds: 300),
+                            child: SlideTransition(
+                              position: _swipeSlideAnimation,
+                              child: FadeTransition(
+                                opacity: _swipeFadeAnimation,
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.keyboard_double_arrow_up_rounded,
+                                      color: Colors.white,
+                                      size: 52,
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      'Swipe Up',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                         ),
+
+                        // ── زرار Next/End يظهر بس بعد الرفع ──
                         Positioned(
-                          bottom: 0,
+                          bottom: 40,
                           left: 0,
                           right: 0,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 25),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.8),
-                                  Colors.transparent,
-                                ],
+                          child: AnimatedOpacity(
+                            opacity: isRevealed ? 1.0 : 0.0,
+                            duration: Duration(milliseconds: 300),
+                            child: IgnorePointer(
+                              ignoring: !isRevealed,
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: _isNavigating ? null : nextCharacter,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color(0x8307ef4e),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 50, vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    currentIndex < shuffledIndices.length - 1
+                                        ? 'Next'
+                                        : 'End',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  namesCharacters[characterIndex + 1],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  '⬆️ Swip Up',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ),

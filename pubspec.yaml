@@ -35,18 +35,19 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  provider: ^6.1.5+1
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
 
-flutter_icons:
-  android: true
+flutter_launcher_icons:
+  android: "ic_launcher"
   ios: true
-  image_path: "assets/spy.png"
-  adaptive_icon_background: "#000000" # لون الخلفية (أسود ليناسب تصميمك)
-  adaptive_icon_foreground: "assets/spy.png" # اللوجو نفسه
+  image_path: "assets/icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -68,33 +69,51 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/characters/a.jpg
-     - assets/characters/b.jpg
-     - assets/characters/c.jpg
-     - assets/characters/d.jpg
-     - assets/characters/e.jpg
-     - assets/characters/f.jpg
-     - assets/characters/g.jpg
-     - assets/characters/h.jpg
-     - assets/characters/i.jpg
-     - assets/characters/j.jpg
-     - assets/characters/k.jpg
-     - assets/characters/l.jpg
-     - assets/characters/m.jpg
-     - assets/characters/n.jpg
-     - assets/characters/o.jpg
-     - assets/characters/p.jpg
-     - assets/characters/q.jpg
-     - assets/characters/r.jpg
-     - assets/characters/joe.jpg
-     - assets/characters/tantoon.jpg
-     - assets/characters/mino.png
-     - assets/security.png
-     - assets/huddle.png
-     - assets/logoSpy.png
-     - assets/spy.png
-     - assets/happy.png
-     - assets/splashScreen.png
+    - assets/characters/a.jpg
+    - assets/characters/b.jpg
+    - assets/characters/c.jpg
+    - assets/characters/d.jpg
+    - assets/characters/e.jpg
+    - assets/characters/f.jpg
+    - assets/characters/g.jpg
+    - assets/characters/h.jpg
+    - assets/characters/i.jpg
+    - assets/characters/j.jpg
+    - assets/characters/k.jpg
+    - assets/characters/l.jpg
+    - assets/characters/m.jpg
+    - assets/characters/n.jpg
+    - assets/characters/o.jpg
+    - assets/characters/p.jpg
+    - assets/characters/q.jpg
+    - assets/characters/r.jpg
+    - assets/characters/joe.jpg
+    - assets/characters/tantoon.jpg
+    - assets/characters/mino.png
+    - assets/characters/tito.png
+    - assets/security.png
+    - assets/huddle.png
+    - assets/logoSpy.png
+    - assets/spy.png
+    - assets/happy.png
+    - assets/splashScreen.png
+    - assets/bg.png
+    - assets/man.png
+    - assets/man2.png
+    - assets/Group.png
+    - assets/icon.png
+    - assets/button/a.png
+    - assets/button/b.png
+    - assets/button/c.png
+    - assets/button/d.png
+    - assets/button/e.png
+    - assets/button/f.png
+    - assets/imageCategory/worker.png
+    - assets/imageCategory/manstahnash.png
+    - assets/imageCategory/food.png
+    - assets/imageCategory/film.png
+    - assets/imageCategory/place.png
+    - assets/imageCategory/celebrities.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
