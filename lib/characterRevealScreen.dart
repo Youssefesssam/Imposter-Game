@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:imposter/Categories_page.dart';
 import 'package:imposter/categoryCharacters.dart';
 import 'package:imposter/categoryItems.dart';
 import 'package:imposter/utilites.dart';
