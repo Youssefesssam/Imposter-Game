@@ -57,12 +57,12 @@ Result & Score
 ### 📸 Screenshots
 
 <p align="center">
-  <img src="./ScreenShoots/cover.png" width="250" />
-<img src="./ScreenShoots/cover1.png" width="250" />
-   <img src="./ScreenShoots/cover2.png" width="250" />
-   <img src="./ScreenShoots/cover3.png" width="250" />
-   <img src="./ScreenShoots/cover4.png" width="250" />
-   <img src="./ScreenShoots/icon.png" width="250" />
+   <img src="./screenShoots/cover.png" width="250" />
+   <img src="./screenShoots/cover1.png" width="250" />
+   <img src="./screenShoots/cover2.png" width="250" />
+   <img src="./screenShoots/cover3.png" width="250" />
+   <img src="./screenShoots/cover4.png" width="250" />
+   <img src="./screenShoots/icon.png" width="250" />
 
 </p>
 
