@@ -1,16 +1,74 @@
-# imposter
+# 🎮 Imposter Game – Flutter
 
-A new Flutter project.
+A multiplayer social deduction game built with Flutter. Players receive a secret word except the Imposter, who must blend in and avoid being detected.
 
-## Getting Started
+Inspired by the concept of Among Us, but focused on guessing and discussion using secret words.
 
-This project is a starting point for a Flutter application.
+## ✨ Features
 
-A few resources to get you started if this is your first Flutter project:
+👤 Choose player characters
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+😈 Select number of imposters
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🗂️ Choose game category (Food, Animals, Countries, etc.)
+
+🔐 Secret word distribution to players
+
+❌ Imposter does not receive the word
+
+💬 Discussion phase to detect the imposter
+
+🗳️ Voting system for all players
+
+🔎 Reveal imposter after voting
+
+🎯 Imposter guesses the word from 4 choices
+
+⭐ Score system for correct votes and answers
+
+## 🎮 How It Works
+
+Players select characters and game settings.
+
+The game assigns a secret word to all players except the imposter.
+
+Players describe or discuss the word.
+
+Everyone votes for the suspected imposter.
+
+The game reveals the imposter.
+
+The imposter guesses the correct word.
+
+Points are calculated and results displayed.
+## 📸 Screenshots
+
+Game Setup Screen
+
+
+Secret Word Distribution
+
+
+Discussion & Voting
+
+
+Result & Score
+
+### 📸 Screenshots
+
+<p align="center">
+  <img src="./ScreenShoots/cover.png" width="250" />
+<img src="./ScreenShoots/cover1.png" width="250" />
+   <img src="./ScreenShoots/cover2.png" width="250" />
+   <img src="./ScreenShoots/cover3.png" width="250" />
+   <img src="./ScreenShoots/cover4.png" width="250" />
+   <img src="./ScreenShoots/icon.png" width="250" />
+
+</p>
+
+
+## 🛠️ Built With
+
+Flutter
+
+Dart
